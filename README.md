@@ -26,13 +26,41 @@ class Thing < ApplicationRecord
   include DebugMethods
 
   debug_methods do
-    def sorted_attrs
-      attributes.sort.to_h
+    # expensive method that puts out attributes in pretty format
+    def list_attrs
+      longest_key_length = attributes.keys.max { |a, b| a.to_s.length <=> b.to_s.length }.length
+      puts
+      attributes.sort.to_h.each do |k, v|
+        spaces_offset = longest_key_length - k.to_s.length
+        spaces = ' ' * spaces_offset
+        puts "#{k}#{spaces}\t#{v == nil ? 'nil' : v}"
+      end
     end
   end
 
 end
 
+```
+
+Then your debug_methods (like `#list_attrs` above) will only be allowed in the
+development environment.
+
+```
+$ RAILS_ENV="development" rails console
+>> person = Person.new(name: "Jake", age: "30")
+>> person.list_attrs
+
+age             30
+created_at	nil
+id        	nil
+name      	Jake
+updated_at	nil
+
+$ RAILS_ENV="test" rails console
+>> person = Person.new(name: "Jake", age: "30")
+>> person.list_attrs
+NoMethodError (undefined method `list_attrs' for #<Thing id: nil, name: "Jake",
+age: 30, created_at: nil, updated_at: nil>)
 ```
 
 DebugMethods defaults to only including methods in the :development environment.
