@@ -1,12 +1,12 @@
 # DebugMethods
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/debug_methods`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+DebugMethods is a module that lets you define environment specific methods in
+your Ruby on Rails app so you can build yourself useful inspection utilities in
+development without adding weight to your classes in production.
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your Rails application's Gemfile:
 
 ```ruby
 gem 'debug_methods'
@@ -16,13 +16,35 @@ And then execute:
 
     $ bundle
 
-Or install it yourself as:
-
-    $ gem install debug_methods
-
 ## Usage
 
-TODO: Write usage instructions here
+Just include DebugMethods in any class and wrap your debug methods in a block
+being passed to #debug_methods.
+
+```ruby
+class Thing < ApplicationRecord
+  include DebugMethods
+
+  debug_methods do
+    def sorted_attrs
+      attributes.sort.to_h
+    end
+  end
+
+end
+
+```
+
+DebugMethods defaults to only including methods in the :development environment.
+To configure which environments debug methods should be available in, add an
+initializer. Add the file `config/initializers/debug_methods.rb` and include the
+following:
+
+```ruby
+DebugMethods.configure do |config|
+  config.environments << :test
+end
+```
 
 ## Development
 
